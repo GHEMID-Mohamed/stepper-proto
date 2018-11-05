@@ -4,41 +4,49 @@ class Stepper extends Component {
   constructor() {
     super();
     this.state = {
-      data: undefined,
+      steps: {},
       currentStep: 0
     };
   }
 
-  getData = data => {
-    this.setState({ data: { ...this.state.data, ...data } });
-  };
+  get currentStep() {
+    return this.state.steps[this.state.currentStep] || {};
+  }
 
-  nextStep = () => {
-    this.setState({ currentStep: this.state.currentStep + 1 });
+  onData = (data, isValid) => {
+    const { steps, currentStep } = this.state;
+    this.setState({ steps: { ...steps, [currentStep]: { data, isValid } } });
   };
 
   previousStep = () => {
     this.setState({ currentStep: this.state.currentStep - 1 });
   };
 
-  renderCurrentStep = () => {
-    const Step = this.props.steps[this.state.currentStep];
-    return <Step onData={this.getData} />;
+  onSubmit = async event => {
+    event.preventDefault();
+    if (this.currentStep.isValid) {
+      await this._onSubmitStep();
+      this.setState({ currentStep: this.state.currentStep + 1 });
+    }
+  };
+
+  _onSubmitStep = () => {};
+  sendOnSubmit = onSubmitStep => {
+    this._onSubmitStep = onSubmitStep;
   };
 
   render() {
+    const Step = this.props.steps[this.state.currentStep];
     return (
-      <div>
-        {this.renderCurrentStep()}
+      <form onSubmit={this.onSubmit}>
+        <Step data={this.currentStep.data} onData={this.onData} sendOnSubmit={this.sendOnSubmit} />
         <br />
         {this.state.currentStep > 0 && (
           <button onClick={this.previousStep}>Previous</button>
         )}
         &nbsp;
-        {this.state.currentStep < this.props.steps.length - 1 && (
-          <button onClick={this.nextStep}>Next</button>
-        )}
-      </div>
+        <button>Next</button>
+      </form>
     );
   }
 }

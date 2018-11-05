@@ -12,39 +12,34 @@ class Step1 extends Component {
   handleInputChange = ({ target }) => {
     const name = target.name;
     const value = target.value;
-    this.setState({ [name]: value });
-    this.props.onData({ [name]: value });
+    this.setState({ [name]: value }, () => {
+      this.props.onData(this.state, this.state.firstName !== "");
+    });
   };
-
-  handleSubmit = event => {
-    event.preventDefault()
-  }
 
   render() {
     return (
       <div>
         <h3>step 1</h3>
-        <form onSubmit={this.handleSubmit}>
-          <div>
-            <input
-              name="firstName"
-              value={this.state.firstName}
-              onChange={this.handleInputChange}
-              placeholder="First name !"
-              required
-            />
-          </div>
-          <br />
-          <div>
-            <input
-              name="lastName"
-              value={this.state.lastName}
-              onChange={this.handleInputChange}
-              placeholder="Last name !"
-              required
-            />
-          </div>
-        </form>
+        <div>
+          <input
+            name="firstName"
+            value={this.state.firstName}
+            onChange={this.handleInputChange}
+            placeholder="First name !"
+            required
+          />
+        </div>
+        <br />
+        <div>
+          <input
+            name="lastName"
+            value={this.state.lastName}
+            onChange={this.handleInputChange}
+            placeholder="Last name !"
+            required
+          />
+        </div>
       </div>
     );
   }

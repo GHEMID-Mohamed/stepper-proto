@@ -13,7 +13,7 @@ class Step2 extends Component {
     const name = target.name;
     const value = target.value;
     this.setState({ [name]: value });
-    this.props.onData({ [name]: value });
+    this.props.onData({ [name]: value }, true);
   };
 
   render() {
