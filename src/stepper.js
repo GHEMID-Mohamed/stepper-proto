@@ -10,7 +10,7 @@ class Stepper extends Component {
   }
 
   getData = data => {
-    this.setState({ data: { ...data, data } });
+    this.setState({ data: { ...this.state.data, ...data } });
   };
 
   nextStep = () => {

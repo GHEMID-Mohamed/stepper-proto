@@ -4,12 +4,16 @@ class Step3 extends Component {
   constructor() {
     super();
     this.state = {
-      value: ""
+      age: "",
+      country: ""
     };
   }
 
-  handleValue = ({ target: { value } }) => {
-    this.setState({ value });
+  handleInputChange = ({ target }) => {
+    const name = target.name;
+    const value = target.value;
+    this.setState({ [name]: value });
+    this.props.onData({ [name]: value });
   };
 
   render() {
@@ -17,12 +21,25 @@ class Step3 extends Component {
       <div>
         <h3>step 3</h3>
         <form>
-          <input
-            value={this.state.value}
-            onChange={this.handleValue}
-            placeholder="Enter something please !"
-            required
-          />
+          <div>
+            <input
+              name="age"
+              value={this.state.age}
+              onChange={this.handleInputChange}
+              placeholder="Age !"
+              required
+            />
+          </div>
+          <br />
+          <div>
+            <input
+              name="country"
+              value={this.state.country}
+              onChange={this.handleInputChange}
+              placeholder="Country !"
+              required
+            />
+          </div>
         </form>
       </div>
     );
