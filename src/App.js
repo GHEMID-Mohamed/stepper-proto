@@ -9,7 +9,7 @@ import Stepper from "./stepper";
 
 class App extends Component {
   steps = [
-    CreditCard, Step3
+    CreditCard, Step3, Step2
   ]
 
   render() {

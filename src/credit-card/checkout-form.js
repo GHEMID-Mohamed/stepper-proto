@@ -14,29 +14,22 @@ const withState = provideState({
     validCVC: false
   }),
   effects: {
-    initialize () {
-      console.log(this.props, this.effects)
-      this.props.sendOnSubmit(this.effects.createToken)
+    initialize() {
+      this.props.sendOnSubmit(this.effects.createToken);
     },
     handleCardNumberChange: (effects, changeObject) => (state, props) => {
       state.validCardNumber = changeObject.complete;
-      if (state.validCardNumberInfo) {
-        props.onData(undefined, true);
-      }
+      props.onData(undefined, state.validCardNumberInfo);
     },
     handleExpirationDate: (_, changeObject) => (state, props) => {
       state.validExpirationDate = changeObject.complete;
-      if (state.validCardNumberInfo) {
-        props.onData(undefined, true);
-      }
+      props.onData(undefined, state.validCardNumberInfo);
     },
     handleCVC: (_, changeObject) => (state, props) => {
       state.validCVC = changeObject.complete;
-      if (state.validCardNumberInfo) {
-        props.onData(undefined, true);
-      }
+      props.onData(undefined, state.validCardNumberInfo);
     },
-    createToken: effects => async (state, props) => {
+    createToken: effects => async (_, props) => {
       try {
         let { token } = await props.stripe.createToken({
           name: "toto" // Card Holder
@@ -48,10 +41,10 @@ const withState = provideState({
             cardLegalInfo: token.card,
             valid: true
           };
-          props.onData(data);
+          props.onData(undefined, true);
         }
       } catch (error) {
-        effects.handleError(error);
+        console.log(error);
       }
     }
   },

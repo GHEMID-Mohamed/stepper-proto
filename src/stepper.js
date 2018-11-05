@@ -1,54 +1,48 @@
-import React, { Component } from "react";
+import React from "react";
+import { injectState, provideState } from "reaclette";
 
-class Stepper extends Component {
-  constructor() {
-    super();
-    this.state = {
-      steps: {},
-      currentStep: 0
-    };
-  }
-
-  get currentStep() {
-    return this.state.steps[this.state.currentStep] || {};
-  }
-
-  onData = (data, isValid) => {
-    const { steps, currentStep } = this.state;
-    this.setState({ steps: { ...steps, [currentStep]: { data, isValid } } });
-  };
-
-  previousStep = () => {
-    this.setState({ currentStep: this.state.currentStep - 1 });
-  };
-
-  onSubmit = async event => {
-    event.preventDefault();
-    if (this.currentStep.isValid) {
-      await this._onSubmitStep();
-      this.setState({ currentStep: this.state.currentStep + 1 });
+const withState = provideState({
+  initialState: () => ({
+    steps: {},
+    currentStep: 0,
+    onSubmitStep: () => {}
+  }),
+  effects: {
+    onData: (_, data, isValid) => state => {
+      const { steps, currentStep } = state;
+      state.steps = { ...steps, [currentStep]: { data, isValid } };
+    },
+    nextStep: () => state => ({
+      ...state,
+      currentStep: state.currentStep + 1
+    }),
+    onSubmit: (effects, event) => async state => {
+      event.preventDefault();
+      const { steps, currentStep } = state;
+      if (steps[currentStep].isValid) {
+        await state.onSubmitStep();
+        effects.nextStep();
+      }
+    },
+    sendOnSubmit: (_, onSubmitStep) => state => {
+      state.onSubmitStep = onSubmitStep;
     }
-  };
-
-  _onSubmitStep = () => {};
-  sendOnSubmit = onSubmitStep => {
-    this._onSubmitStep = onSubmitStep;
-  };
-
-  render() {
-    const Step = this.props.steps[this.state.currentStep];
-    return (
-      <form onSubmit={this.onSubmit}>
-        <Step data={this.currentStep.data} onData={this.onData} sendOnSubmit={this.sendOnSubmit} />
-        <br />
-        {this.state.currentStep > 0 && (
-          <button onClick={this.previousStep}>Previous</button>
-        )}
-        &nbsp;
-        <button>Next</button>
-      </form>
-    );
   }
-}
+});
 
-export default Stepper;
+const Stepper = ({ state, effects, steps }) => {
+  const Step = steps[state.currentStep];
+  return (
+    <form onSubmit={effects.onSubmit}>
+      <Step onData={effects.onData} sendOnSubmit={effects.sendOnSubmit} />
+      <br />
+      {state.currentStep > 0 && (
+        <button onClick={effects.previousStep}>Previous</button>
+      )}
+      &nbsp;
+      <button>Next</button>
+    </form>
+  );
+};
+
+export default withState(injectState(Stepper));
